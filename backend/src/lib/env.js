@@ -1,0 +1,25 @@
+import "dotenv/config";
+
+export const ENV = {
+    PORT: process.env.PORT,
+    MONGO_URI: process.env.MONGO_URI,
+    NODE_ENV: process.env.NODE_ENV,
+    JWT_SECRET: process.env.JWT_SECRET,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    EMAIL_FROM: process.env.EMAIL_FROM,
+    EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME,
+    CLIENT_URL: process.env.CLIENT_URL,
+    
+
+}
+
+/*
+PORT = 3000
+MONGO_URI = mongodb+srv://tinoe0404_db_user:wIOlpjiD03216IYB@cluster1.vtq2gd9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1
+NODE_ENV = development
+JWT_SECRET =myjwtsecret
+RESEND_API_KEY = re_4rjwH6yp_KjAzq68ue4vxpjZZPLpV6Bb8
+EMAIL_FROM = "onboarding@resend.dev"
+EMAIL_FROM-NAME = "Tinotenda Chandengenda"
+CLIENT_URL = http://localhost:5173
+*/
