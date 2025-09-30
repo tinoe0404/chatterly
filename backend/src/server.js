@@ -12,7 +12,7 @@ const __dirname = path.resolve();
 
 const PORT = ENV.PORT || 3000;
  
-app.use(express.json());  //req.body
+app.use(express.json({ limit: "10mb" }));
 app.use(cors({origin: ENV.CLIENT_URL, credentials: true}));
 app.use(cookieParser());
   
@@ -34,3 +34,4 @@ app.listen(PORT, () => {
   console.log("Server running on port " + PORT)
   connectDB()
 });
+
