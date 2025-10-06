@@ -1,9 +1,8 @@
 import cloudinary from "../lib/cloudinary.js";
-import { getReceiverSocketId } from "../lib/socket.js";
+import { getReceiverSocketId, io } from "../lib/socket.js";
 import Message from "../models/Message.js";
 import User from "../models/User.js";
 
-// Get all contacts except the logged-in user
 export const getAllContacts = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
@@ -16,7 +15,6 @@ export const getAllContacts = async (req, res) => {
   }
 };
 
-// Get all messages between logged-in user and another user
 export const getMessagesByUserId = async (req, res) => {
   try {
     const myId = req.user._id;
@@ -27,16 +25,15 @@ export const getMessagesByUserId = async (req, res) => {
         { senderId: myId, receiverId: userToChatId },
         { senderId: userToChatId, receiverId: myId },
       ],
-    }).sort({ createdAt: 1 }); // optional: sort by oldest → newest
+    });
 
     res.status(200).json(messages);
   } catch (error) {
-    console.log("Error in getMessages controller:", error.message);
+    console.log("Error in getMessages controller: ", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 };
 
-// Send message (with optional image upload)
 export const sendMessage = async (req, res) => {
   try {
     const { text, image } = req.body;
@@ -44,18 +41,19 @@ export const sendMessage = async (req, res) => {
     const senderId = req.user._id;
 
     if (!text && !image) {
-      return res.status(400).json({ error: "Message text or image is required" });
+      return res.status(400).json({ message: "Text or image is required." });
     }
     if (senderId.equals(receiverId)) {
-      return res.status(400).json({ error: "Cannot send message to yourself" });
+      return res.status(400).json({ message: "Cannot send messages to yourself." });
     }
-    const receiverExists = await User.exists({ _id: receiverId});
+    const receiverExists = await User.exists({ _id: receiverId });
     if (!receiverExists) {
-      return res.status(404).json({ error: "Receiver not found" });
+      return res.status(404).json({ message: "Receiver not found." });
     }
+
     let imageUrl;
     if (image) {
-      // Upload base64 image to Cloudinary
+      // upload base64 image to cloudinary
       const uploadResponse = await cloudinary.uploader.upload(image);
       imageUrl = uploadResponse.secure_url;
     }
@@ -69,14 +67,14 @@ export const sendMessage = async (req, res) => {
 
     await newMessage.save();
 
-    const getReceiverSocketId = getReceiverSocketId(receiverId); 
-    if (getReceiverSocketId) {
-      io.to(getReceiverSocketId).emit("newMessage", newMessage);
-    } 
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newMessage", newMessage);
+    }
 
     res.status(201).json(newMessage);
   } catch (error) {
-    console.log("Error in sendMessage controller:", error.message);
+    console.log("Error in sendMessage controller: ", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -99,7 +97,9 @@ export const getChatPartners = async (req, res) => {
         )
       ),
     ];
+
     const chatPartners = await User.find({ _id: { $in: chatPartnerIds } }).select("-password");
+
     res.status(200).json(chatPartners);
   } catch (error) {
     console.error("Error in getChatPartners: ", error.message);
