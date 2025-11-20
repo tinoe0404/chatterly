@@ -10,7 +10,6 @@ Image/media uploads
 Rate-limited API
 Responsive React UI (Tailwind + Zustand)
 
-📁 Project Structure
 chatterly/
 │
 ├── backend/
@@ -33,6 +32,7 @@ chatterly/
     ├── tailwind.config.js
     ├── eslint.config.js
     └── package.json
+
 
 🧰 Tech Stack
 Frontend: React, Tailwind CSS, Zustand, Vite
